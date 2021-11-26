@@ -72,7 +72,7 @@ function parsePython(pythonCode, reqdata, requrl) {
   var scripts = document.querySelectorAll('serverscript');
   for (var script = 0; script < scripts.length; script++) {
     var thesescripts = scripts;
-    fs.writeFileSync('tempfile.py', 'import sys\nreqdata = sys.argv[1]\n' + htmlEscaper.unescape(scripts[script].innerHTML));
+    fs.writeFileSync('tempfile.py', 'import sys\nreqdata = sys.argv[1]\nrequrl = sys.argv[2]\n' + htmlEscaper.unescape(scripts[script].innerHTML));
     var stdout = cp.execSync('python tempfile.py "' + reqdata + '" "' + requrl + '"');
     thesescripts[script].outerHTML = stdout.toString();
     fs.unlinkSync('tempfile.py');
