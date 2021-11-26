@@ -43,7 +43,7 @@ http.createServer(function(req, res) {
     }
     else {
       if (parsedurl.pathname.split('.')[1] == 'html') {
-        var parsed = parsePython(data.toString(), reqdata);
+        var parsed = parsePython(data.toString(), reqdata, req.data);
         res.writeHead(200, { 'Content-Type': 'text/html', 'Content-Length': parsed.length });
         res.end(parsed);
       }
@@ -67,13 +67,13 @@ http.createServer(function(req, res) {
   });
 }).listen(process.argv[2]);
 
-function parsePython(pythonCode, reqdata) {
+function parsePython(pythonCode, reqdata, requrl) {
   var document = new JSDOM(pythonCode).window.document;
   var scripts = document.querySelectorAll('serverscript');
   for (var script = 0; script < scripts.length; script++) {
     var thesescripts = scripts;
     fs.writeFileSync('tempfile.py', 'import sys\nreqdata = sys.argv[1]\n' + htmlEscaper.unescape(scripts[script].innerHTML));
-    var stdout = cp.execSync('python tempfile.py "' + reqdata + '"');
+    var stdout = cp.execSync('python tempfile.py "' + reqdata + '" "' + requrl + '"');
     thesescripts[script].outerHTML = stdout.toString();
     fs.unlinkSync('tempfile.py');
     scripts = thesescripts;
