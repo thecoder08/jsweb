@@ -36,8 +36,9 @@ http.createServer(function(req, res) {
           res.end(page404);
         }
         else {
-          res.writeHead(404, { 'Content-Type': 'text/html', 'Content-Length': data.length });
-          res.end(data);
+          var parsed = parsePython(data.toString(), reqdata, req.url);
+          res.writeHead(404, { 'Content-Type': 'text/html', 'Content-Length': parsed.length });
+          res.end(parsed);
         }
       });
     }
