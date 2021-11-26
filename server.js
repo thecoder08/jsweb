@@ -43,7 +43,7 @@ http.createServer(function(req, res) {
     }
     else {
       if (parsedurl.pathname.split('.')[1] == 'html') {
-        var parsed = parsePython(data.toString(), reqdata, req.data);
+        var parsed = parsePython(data.toString(), reqdata, req.url);
         res.writeHead(200, { 'Content-Type': 'text/html', 'Content-Length': parsed.length });
         res.end(parsed);
       }
