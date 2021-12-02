@@ -84,15 +84,19 @@ function parsePython(pythonCode, reqdata, requrl, errcallback, sucesscallback) {
   for (var script = 0; script < scripts.length; script++) {
     var thesescripts = scripts;
     var code = 'import sys\nreqdata = sys.argv[1]\nrequrl = sys.argv[2]\n' + htmlEscaper.unescape(scripts[script].innerHTML).replace(/"/g, '\\"');
-    cp.exec('python tempfile.py -c "' +  + '" "' + reqdata + '" "' + requrl + '"', function(err, stdout, stderr) {
+    cp.exec('python tempfile.py -c "' + code + '" "' + reqdata + '" "' + requrl + '"', function(err, stdout, stderr) {
       if (err) {
         errcallback(err);
         errhappened = true;
-        break;
+      }
+      else {
+        thesescripts[script].outerHTML = stdout.toString();
+        scripts = thesescripts;
       }
     });
-    thesescripts[script].outerHTML = stdout.toString();
-    scripts = thesescripts;
+    if (errhappened) {
+      break;
+    }
   }
   if (!errhappened) {
     sucesscallback('<!DOCTYPE html>\n' + document.documentElement.outerHTML);
