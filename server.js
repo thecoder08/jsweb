@@ -90,6 +90,6 @@ function parsePython(pythonCode, reqdata, requrl) {
       donescripts++;
     });
   }
-  while (donescripts < scripts.length) {}
+  while (donescripts < scripts.length) { console.log(donescripts, scripts.length); }
   return '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
 }
