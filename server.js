@@ -44,9 +44,14 @@ http.createServer(function(req, res) {
     }
     else {
       if (parsedurl.pathname.split('.')[1] == 'html') {
-        var parsed = parsePython(data.toString(), reqdata, req.url);
-        res.writeHead(200, { 'Content-Type': 'text/html', 'Content-Length': parsed.length });
-        res.end(parsed);
+        parsePython(data.toString(), reqdata, req.url, function(err) {
+          var servererror = '<!DOCTYPE html><html lang="en" dir="ltr"><head><meta charset="utf-8"><title>500 server error!</title></head><body><h1>500 server error!</h1><p>The server encountered the following error while processing your request: ' + err + '</p><a href="/">Go Home</a></body></html>'
+          res.writeHead(500, { 'Content-Type': 'text/html', 'Content-Length': servererror.length });
+          res.end(servererror);
+        }, function(result) {
+          res.writeHead(200, { 'Content-Type': 'text/html', 'Content-Length': result.length });
+          res.end(result);
+        });
       }
       else if (parsedurl.pathname.split('.')[1] == 'txt') {
         res.writeHead(200, { 'Content-Type': 'text/plain', 'Content-Length': data.length });
@@ -60,6 +65,10 @@ http.createServer(function(req, res) {
         res.writeHead(200, { 'Content-Type': 'text/css', 'Content-Length': data.length });
         res.end(data);
       }
+      else if (parsedurl.pathname.split('.')[1] == 'ico') {
+        res.writeHead(200, { 'Content-Type': 'image/x-icon', 'Content-Length': data.length });
+        res.end(data);
+      }
       else {
         res.writeHead(200, { 'Content-Type': 'application/octet-stream', 'Content-Length': data.length });
         res.end(data);
@@ -68,16 +77,24 @@ http.createServer(function(req, res) {
   });
 }).listen(process.argv[2]);
 
-function parsePython(pythonCode, reqdata, requrl) {
+function parsePython(pythonCode, reqdata, requrl, errcallback, sucesscallback) {
+  var errhappened = false;
   var document = new JSDOM(pythonCode).window.document;
   var scripts = document.querySelectorAll('serverscript');
   for (var script = 0; script < scripts.length; script++) {
     var thesescripts = scripts;
-    fs.writeFileSync('tempfile.py', 'import sys\nreqdata = sys.argv[1]\nrequrl = sys.argv[2]\n' + htmlEscaper.unescape(scripts[script].innerHTML));
-    var stdout = cp.execSync('python tempfile.py "' + reqdata + '" "' + requrl + '"');
+    var code = 'import sys\nreqdata = sys.argv[1]\nrequrl = sys.argv[2]\n' + htmlEscaper.unescape(scripts[script].innerHTML).replace(/"/g, '\\"');
+    cp.exec('python tempfile.py -c "' +  + '" "' + reqdata + '" "' + requrl + '"', function(err, stdout, stderr) {
+      if (err) {
+        errcallback(err);
+        errhappened = true;
+        break;
+      }
+    });
     thesescripts[script].outerHTML = stdout.toString();
-    fs.unlinkSync('tempfile.py');
     scripts = thesescripts;
   }
-  return '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+  if (!errhappened) {
+    sucesscallback('<!DOCTYPE html>\n' + document.documentElement.outerHTML);
+  }
 }
