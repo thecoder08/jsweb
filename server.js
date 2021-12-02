@@ -36,9 +36,14 @@ http.createServer(function(req, res) {
           res.end(page404);
         }
         else {
-          var parsed = parsePython(data.toString(), reqdata, req.url);
-          res.writeHead(404, { 'Content-Type': 'text/html', 'Content-Length': parsed.length });
-          res.end(parsed);
+          parsePython(data.toString(), reqdata, req.url, function(err) {
+            var servererror = '<!DOCTYPE html><html lang="en" dir="ltr"><head><meta charset="utf-8"><title>500 server error!</title></head><body><h1>500 server error!</h1><p>The server encountered the following error while processing your request: ' + err + '</p><a href="/">Go Home</a></body></html>';
+            res.writeHead(500, { 'Content-Type': 'text/html', 'Content-Length': servererror.length });
+            res.end(servererror);
+          }, function(result) {
+            res.writeHead(404, { 'Content-Type': 'text/html', 'Content-Length': result.length });
+            res.end(result);
+          });
         }
       });
     }
