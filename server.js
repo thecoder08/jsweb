@@ -77,19 +77,18 @@ function parsePython(pythonCode, reqdata, requrl) {
   var scripts = document.querySelectorAll('serverscript');
   var donescripts = 0;
   for (var script = 0; script < scripts.length; script++) {
-    var thesescripts = scripts;
-    var code = 'import sys\nreqdata = sys.argv[1]\nrequrl = sys.argv[2]\n' + htmlEscaper.unescape(scripts[script].innerHTML).replace(/"/g, '\\"');
-    cp.exec('python tempfile.py -c "' + code + '" "' + reqdata + '" "' + requrl + '"', function(err, stdout, stderr) {
-      if (err) {
-        thesescripts[script].outerHTML = err.toString();
-      }
-      else {
-        thesescripts[script].outerHTML = stdout.toString();
-      }
-      scripts = thesescripts;
-      donescripts++;
-    });
+    var code = 'import sys\nreqdata = sys.argv[1]\nrequrl = sys.argv[2]\n' + htmlEscaper.unescape(scripts[script].innerHTML).replace(/"/g, '\\\"');
+    var proc = cp.exec('"python -c \\"' + code + '\\" \\"' + reqdata + '\\" \\"' + requrl + '\\""', console.log);
   }
-  while (donescripts < scripts.length) { console.log(donescripts, scripts.length); }
-  return '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+  //return '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
 }
+/*function(err, stdout, stderr) {
+  console.log('donescripts went up');
+  donescripts++;
+  if (err) {
+    scripts[script].outerHTML = err.toString();
+  }
+  else {
+    scripts[script].outerHTML = stdout.toString();
+  }
+}*/
