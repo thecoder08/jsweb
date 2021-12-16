@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 var http = require('http');
 var fs = require('fs');
 var url = require('url');
@@ -36,17 +35,19 @@ http.createServer(function(req, res) {
           res.end(page404);
         }
         else {
-          var result = parsePython(data.toString(), reqdata, req.url);
-        res.writeHead(404, { 'Content-Type': 'text/html', 'Content-Length': result.length });
-        res.end(result);
+          parsePython(data.toString(), reqdata, req.url, function(result) {
+            res.writeHead(404, { 'Content-Type': 'text/html', 'Content-Length': result.length });
+            res.end(result);
+          });
         }
       });
     }
     else {
       if (parsedurl.pathname.split('.')[1] == 'html') {
-        var result = parsePython(data.toString(), reqdata, req.url);
-        res.writeHead(200, { 'Content-Type': 'text/html', 'Content-Length': result.length });
-        res.end(result);
+        parsePython(data.toString(), reqdata, req.url, function(result) {
+          res.writeHead(200, { 'Content-Type': 'text/html', 'Content-Length': result.length });
+          res.end(result);
+        });
       }
       else if (parsedurl.pathname.split('.')[1] == 'txt') {
         res.writeHead(200, { 'Content-Type': 'text/plain', 'Content-Length': data.length });
@@ -72,12 +73,12 @@ http.createServer(function(req, res) {
   });
 }).listen(process.argv[2]);
 
-function parsePython(pythonCode, reqdata, requrl) {
+function parsePython(pythonCode, reqdata, requrl, callback) {
   var document = new JSDOM(pythonCode).window.document;
   var scripts = document.querySelectorAll('serverscript');
   var donescripts = 0;
   for (var script = 0; script < scripts.length; script++) {
-    var code = 'import sys\nreqdata = sys.argv[1]\nrequrl = sys.argv[2]\n' + htmlEscaper.unescape(scripts[script].innerHTML).replace(/"/g, '\\"');
+    var code = 'import sys\nreqdata = sys.argv[1]\nrequrl = sys.argv[2]\n' + htmlEscaper.unescape(scripts[script].innerHTML).replace(/"/g, '\"');
     var proc = cp.exec('python -c \\"' + code + '\\" \\"' + reqdata + '\\" \\"' + requrl + '\\"', function(err, stdout, stderr) {
       donescripts++;
       if (err) {
@@ -87,19 +88,8 @@ function parsePython(pythonCode, reqdata, requrl) {
         scripts[script].outerHTML = stdout.toString();
       }
       if (donescripts == scripts.length) {
-        return;
+        callback('<!DOCTYPE html>\n' + document.documentElement.outerHTML);
       }
     });
   }
-  //return '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
 }
-/*function(err, stdout, stderr) {
-  console.log('donescripts went up');
-  donescripts++;
-  if (err) {
-    scripts[script].outerHTML = err.toString();
-  }
-  else {
-    scripts[script].outerHTML = stdout.toString();
-  }
-}*/
