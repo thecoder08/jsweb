@@ -77,8 +77,19 @@ function parsePython(pythonCode, reqdata, requrl) {
   var scripts = document.querySelectorAll('serverscript');
   var donescripts = 0;
   for (var script = 0; script < scripts.length; script++) {
-    var code = 'import sys\nreqdata = sys.argv[1]\nrequrl = sys.argv[2]\n' + htmlEscaper.unescape(scripts[script].innerHTML).replace(/"/g, '\\\"');
-    var proc = cp.exec('"python -c \\"' + code + '\\" \\"' + reqdata + '\\" \\"' + requrl + '\\""', console.log);
+    var code = 'import sys\nreqdata = sys.argv[1]\nrequrl = sys.argv[2]\n' + htmlEscaper.unescape(scripts[script].innerHTML).replace(/"/g, '\\"');
+    var proc = cp.exec('python -c \\"' + code + '\\" \\"' + reqdata + '\\" \\"' + requrl + '\\"', function(err, stdout, stderr) {
+      donescripts++;
+      if (err) {
+        scripts[script].outerHTML = err.toString();
+      }
+      else {
+        scripts[script].outerHTML = stdout.toString();
+      }
+      if (donescripts == scripts.length) {
+        return;
+      }
+    });
   }
   //return '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
 }
