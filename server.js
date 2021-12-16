@@ -77,9 +77,13 @@ function parsePython(pythonCode, reqdata, requrl, callback) {
   var document = new JSDOM(pythonCode).window.document;
   var scripts = document.querySelectorAll('serverscript');
   var donescripts = 0;
-  for (var script = 0; script < scripts.length; script++) {
-    var code = 'import sys\nreqdata = sys.argv[1]\nrequrl = sys.argv[2]\n' + htmlEscaper.unescape(scripts[script].innerHTML).replace(/"/g, '\"');
-    var proc = cp.exec('python -c \\"' + code + '\\" \\"' + reqdata + '\\" \\"' + requrl + '\\"', function(err, stdout, stderr) {
+  if (scripts.length == 0) {
+    callback(pythonCode);
+  }
+  else {
+  for (let script = 0; script < scripts.length; script++) {
+    var code = 'import sys\nreqdata = sys.argv[1]\nrequrl = sys.argv[2]\n' + htmlEscaper.unescape(scripts[script].innerHTML).replace(/"/g, '\\"');
+    var proc = cp.exec('python -c "' + code + '" "' + reqdata + '" "' + requrl + '"', function(err, stdout, stderr) {
       donescripts++;
       if (err) {
         scripts[script].outerHTML = err.toString();
@@ -91,5 +95,6 @@ function parsePython(pythonCode, reqdata, requrl, callback) {
         callback('<!DOCTYPE html>\n' + document.documentElement.outerHTML);
       }
     });
+  }
   }
 }
