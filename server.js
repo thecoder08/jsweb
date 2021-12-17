@@ -86,7 +86,7 @@ function parsePython(pythonCode, reqdata, requrl, callback) {
     var proc = cp.exec('python -c "' + code + '" "' + reqdata + '" "' + requrl + '"', function(err, stdout, stderr) {
       donescripts++;
       if (err) {
-        scripts[script].outerHTML = err.toString();
+        scripts[script].outerHTML = '<code>' + err.toString() + '</code>';
       }
       else {
         scripts[script].outerHTML = stdout.toString();
