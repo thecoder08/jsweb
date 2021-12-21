@@ -86,7 +86,7 @@ function parsePython(pythonCode, reqdata, requrl, callback) {
     var proc = cp.exec('python -c "' + code + '" "' + reqdata + '" "' + requrl + '"', function(err, stdout, stderr) {
       donescripts++;
       if (err) {
-        scripts[script].outerHTML = '<xmp>' + err.toString() + '</xmp>';
+        scripts[script].outerHTML = '<xmp>' + stderr.toString() + '\nIf you are a normal user using this site, contact the webmaster and give them this error message. If you are the webmaster, frick you!</xmp>';
       }
       else {
         scripts[script].outerHTML = stdout.toString();
