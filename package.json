@@ -3,11 +3,11 @@
     "html-escaper": "^3.0.3",
     "jsdom": "^18.1.0"
   },
-  "name": "pyweb",
+  "name": "jsweb",
   "version": "1.0.1",
-  "description": "A web server for websites written in python",
+  "description": "A web server for websites written in node.js",
   "bin": {
-    "pyweb": "server.js"
+    "jsweb": "server.js"
   },
   "author": "thecoder08",
   "license": "MIT"
