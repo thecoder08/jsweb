@@ -23,17 +23,17 @@ jobs:
       - name: Upload Windows build
         uses: actions/upload-artifact@v2
         with:
-          name: pyweb-win.exe
-          path: pyweb-win.exe
+          name: jsweb-win.exe
+          path: jsweb-win.exe
 
       - name: Upload Linux build
         uses: actions/upload-artifact@v2
         with:
-          name: pyweb-linux
-          path: pyweb-linux
+          name: jsweb-linux
+          path: jsweb-linux
 
       - name: Upload MacOS build
         uses: actions/upload-artifact@v2
         with:
-          name: pyweb-macos
-          path: pyweb-macos
+          name: jsweb-macos
+          path: jsweb-macos
