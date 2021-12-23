@@ -1,4 +1,4 @@
-var http = require('http');
+pythonvar http = require('http');
 var fs = require('fs');
 var url = require('url');
 var htmlEscaper = require('html-escaper');
@@ -82,8 +82,8 @@ function parsePython(pythonCode, reqdata, requrl, callback) {
   }
   else {
   for (let script = 0; script < scripts.length; script++) {
-    var code = 'import sys\nreqdata = sys.argv[1]\nrequrl = sys.argv[2]\n' + htmlEscaper.unescape(scripts[script].innerHTML).replace(/"/g, '\\"');
-    var proc = cp.exec('python -c "' + code + '" "' + reqdata + '" "' + requrl + '"', function(err, stdout, stderr) {
+    var code = 'var reqdata = process.argv[1];\nvar requrl = process.argv[2];\n' + htmlEscaper.unescape(scripts[script].innerHTML).replace(/"/g, '\\"');
+    var proc = cp.exec('node -e "' + code + '" "' + reqdata + '" "' + requrl + '"', function(err, stdout, stderr) {
       donescripts++;
       if (err) {
         scripts[script].outerHTML = '<xmp>' + stderr.toString() + '\nIf you are a normal user using this site, contact the webmaster and give them this error message. If you are the webmaster, frick you!</xmp>';
