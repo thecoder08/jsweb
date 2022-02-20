@@ -1,6 +1,7 @@
 var http = require('http');
 var fs = require('fs');
 var url = require('url');
+var render = require('@thecoder08/markdown');
 var htmlEscaper = require('html-escaper');
 var JSDOM = require('jsdom').JSDOM;
 var cp = require('child_process');
@@ -56,6 +57,28 @@ http.createServer(function(req, res) {
       else if (parsedurl.pathname.split('.')[1] == 'js') {
         res.writeHead(200, { 'Content-Type': 'text/js', 'Content-Length': data.length });
         res.end(data);
+      }
+      else if (parsedurl.pathname.split('.')[1] == 'mp4') {
+        res.writeHead(200, { 'Content-Type': 'video/mp4', 'Content-Length': data.length });
+        res.end(data);
+      }
+      else if (parsedurl.pathname.split('.')[1] == 'mp3') {
+        res.writeHead(200, { 'Content-Type': 'audio/mp3', 'Content-Length': data.length });
+        res.end(data);
+      }
+      else if (parsedurl.pathname.split('.')[1] == 'wav') {
+        res.writeHead(200, { 'Content-Type': 'audio/wav', 'Content-Length': data.length });
+        res.end(data);
+      }
+      else if (parsedurl.pathname.split('.')[1] == 'json') {
+        res.writeHead(200, { 'Content-Type': 'application/json', 'Content-Length': data.length });
+        res.end(data);
+      }
+      else if (parsedurl.pathname.split('.')[1] == 'md') {
+        parsePython(render(data.toString()), reqdata, req.url, function(result) {
+          res.writeHead(200, { 'Content-Type': 'text/html;charset=utf-8', 'Content-Length': result.length });
+          res.end(result);
+        });
       }
       else if (parsedurl.pathname.split('.')[1] == 'css') {
         res.writeHead(200, { 'Content-Type': 'text/css', 'Content-Length': data.length });
