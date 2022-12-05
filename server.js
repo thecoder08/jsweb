@@ -106,7 +106,7 @@ function parsePython(pythonCode, reqdata, requrl, callback) {
   else {
   for (let script = 0; script < scripts.length; script++) {
     var code = 'var reqdata = process.argv[1];\nvar requrl = process.argv[2];\n' + htmlEscaper.unescape(scripts[script].innerHTML).replace(/"/g, '\\"');
-    var proc = cp.exec('node -e "' + code + '" "' + reqdata + '" "' + requrl + '"', function(err, stdout, stderr) {
+    var proc = cp.exec('/usr/bin/env node -e "' + code + '" "' + reqdata + '" "' + requrl + '"', function(err, stdout, stderr) {
       donescripts++;
       if (err) {
         scripts[script].outerHTML = '<xmp>' + stderr.toString() + '\nIf you are a normal user using this site, contact the webmaster and give them this error message. If you are the webmaster, frick you!</xmp>';
